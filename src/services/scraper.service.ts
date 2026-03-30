@@ -4,26 +4,26 @@ import { News } from '../models/News';
 
 export const scrapeLatestNews = async () => {
   try {
-    const { data } = await axios.get('https://kantipurtv.com/');
+    const newsApiUrl = process.env.NEWS_API_URL || 'https://www.onlinekhabar.com/';
+    const { data } = await axios.get(newsApiUrl);
     const $ = cheerio.load(data);
 
-    // Using the exact selectors requested by the user
-    // The target is the <a> tag inside the first article of the main news block
-    const articleElem = $('.main-news-block .article-drop').first();
-    const titleLink = articleElem.find('h1.fs-1 a.article-title.article-link');
+    // Precise selector based on OnlineKhabar.com structure
+    // Target: <a> tag inside <h2> within <section class="ok-bises ok-bises-type-2">
+    const titleLink = $('.ok-bises.ok-bises-type-2 h2 a').first();
 
     if (titleLink.length > 0) {
       const title = titleLink.text().trim();
       const url = titleLink.attr('href');
 
       if (title && url) {
-        // Attempt to save to MongoDB
-        // Using upsert or updating based on URL to prevent duplicates while updating 'fetchedAt' maybe
-        // Wait, just storing the latest is fine. But wait, if they want history, a new record is fine.
-        // Let's use updateOne with upsert to insert standard unique article based on URL
+        // Use the hostname as the source (e.g., onlinekhabar.com)
+        const source = new URL(newsApiUrl).hostname;
+
+        // Upsert the latest news record using its URL as the unique key
         const savedNews = await News.findOneAndUpdate(
           { url },
-          { title, url, fetchedAt: new Date() },
+          { title, url, source, fetchedAt: new Date() },
           { upsert: true, new: true, setDefaultsOnInsert: true }
         );
         console.log(`Successfully scraped and saved: ${title}`);
@@ -31,7 +31,7 @@ export const scrapeLatestNews = async () => {
       }
     }
     
-    console.warn('Could not find the target news element on the page. Selectors might have changed.');
+    console.warn(`Could not find the target news element at ${newsApiUrl}. The selectors might have changed.`);
     return null;
   } catch (error) {
     console.error(`Error scraping news: ${(error as Error).message}`);

@@ -19,7 +19,7 @@ const NewsSchema: Schema = new Schema({
   },
   source: {
     type: String,
-    default: 'kantipurtv.com',
+    required: true,
   },
   fetchedAt: {
     type: Date,
