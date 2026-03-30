@@ -20,7 +20,16 @@ export const scrapeLatestNews = async () => {
         // Use the hostname as the source (e.g., onlinekhabar.com)
         const source = new URL(newsApiUrl).hostname;
 
-        // Upsert the latest news record using its URL as the unique key
+        // Check if the news is the same as the last scraped item
+        const latestEntry = await News.findOne().sort({ fetchedAt: -1 });
+
+        if (latestEntry && latestEntry.url === url && latestEntry.title === title) {
+          console.log(`News already up to date: ${title}`);
+          return latestEntry;
+        }
+
+        // Upsert the news record (update fetchedAt if url is the same but something else changed, 
+        // normally this handles updates if needed while preventing duplicates)
         const savedNews = await News.findOneAndUpdate(
           { url },
           { title, url, source, fetchedAt: new Date() },
