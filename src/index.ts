@@ -3,7 +3,6 @@ import helmet from 'helmet';
 import cors from 'cors';
 import compression from 'compression';
 import morgan from 'morgan';
-import 'express-async-errors';
 
 import { env } from './config/env';
 import { connectDB } from './config/db';
