@@ -24,6 +24,8 @@ const router = Router();
  *                   properties:
  *                     title:
  *                       type: string
+ *                     revampedTitle:
+ *                       type: string
  *                     url:
  *                       type: string
  *                     source:

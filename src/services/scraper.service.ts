@@ -1,6 +1,7 @@
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 import { News } from '../models/News';
+import { revampNewsContent } from './ai.service';
 
 export const scrapeLatestNews = async () => {
   try {
@@ -28,11 +29,15 @@ export const scrapeLatestNews = async () => {
           return latestEntry;
         }
 
+        // New content detected, revamp it with AI to avoid copyright issues
+        console.log(`Generating AI revamp for: ${title}...`);
+        const aiContent = await revampNewsContent(title);
+
         // Upsert the news record (update fetchedAt if url is the same but something else changed, 
         // normally this handles updates if needed while preventing duplicates)
         const savedNews = await News.findOneAndUpdate(
           { url },
-          { title, url, source, fetchedAt: new Date() },
+          { title, url, source, aiContent, fetchedAt: new Date() },
           { upsert: true, new: true, setDefaultsOnInsert: true }
         );
         console.log(`Successfully scraped and saved: ${title}`);

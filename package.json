@@ -21,6 +21,7 @@
     "express": "^5.2.1",
     "mongoose": "^9.3.3",
     "node-cron": "^4.2.1",
+    "openai": "^6.33.0",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1"
   },

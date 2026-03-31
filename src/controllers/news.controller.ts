@@ -17,6 +17,7 @@ export const getLatestNews = async (req: Request, res: Response) => {
       success: true,
       data: {
         title: latestNews.title,
+        revampedTitle: latestNews.aiContent || latestNews.title,
         url: latestNews.url,
         source: latestNews.source,
         fetchedAt: latestNews.fetchedAt
