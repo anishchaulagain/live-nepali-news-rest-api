@@ -17,8 +17,12 @@ import logger from './config/logger';
 // Load env vars validation happens in env.ts
 const app = express();
 
+logger.info(`Initializing News API in ${env.NODE_ENV} mode...`);
+
 // Connect to database
-connectDB();
+connectDB().catch((err) => {
+  logger.error(`Initial database connection failed: ${err.message}`);
+});
 
 // Middleware
 app.use(helmet()); // Security headers
